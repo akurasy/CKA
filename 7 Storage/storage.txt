@@ -1,0 +1,78 @@
+CSI
+
+The CSI driver ensures that external volumes such as aws ebs can be attached to your Kubernetes pod. just as attaching a rexray volume to docker containers so it can be attached to an ebs volume. 
+
+
+===============================
+
+VOLUME
+
+volume is used for data persistence.
+
+apiVersion
+kind
+metadata
+spec
+  - containers
+    -  image
+       name
+       volumeMount:
+       - mountPath: /opt
+         name: data-volume
+
+
+    volume
+    - name: data-volume
+      hostpath:
+      - path: /data
+        type: directory
+
+
+
+=======================================
+
+PERSISTENCE VOLUME
+This allows storage to be managed centrally. This is managed by an Admin
+
+
+PERSISTENCE VOLUME CLAIM
+
+This is created by the user to use the storage. This binds to a PV.
+Once you create a PVC use it in a POD definition file by specifying the PVC Claim name under persistentVolumeClaim section in the volumes section like this:
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim
+
+
+The same is true for ReplicaSets or Deployments. Add this to the pod template section of a Deployment on ReplicaSet.
+
+
+Reference URL: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#claims-as-volumes       
+
+
+============================================
+
+STORAGE CLASS
+
+This is used in dynamic provisioning of volumes on google cloud
+
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: google-storage
+provisioner: Kubernetes.io/gce-pd
